@@ -1,0 +1,9 @@
+[submodule "media"]
+	path = media
+	url = git@github.com:ncc-sg-komutracker/media.git
+[submodule "kt-server"]
+	path = kt-server
+	url = git@github.com:ncc-sg-komutracker/kt-server.git
+[submodule "kt-client"]
+	path = kt-client
+	url = git@github.com:ncc-sg-komutracker/kt-client.git
