@@ -1,0 +1,6 @@
+[submodule "aw-watcher-afk"]
+	path = aw-watcher-afk
+	url = git@github.com:ncc-sg/aw-watcher-afk.git
+[submodule "aw-watcher-window"]
+	path = aw-watcher-window
+	url = git@github.com:ncc-sg/aw-watcher-window.git
