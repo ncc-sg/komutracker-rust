@@ -101,10 +101,14 @@ run-sync: kt-server-rust/target/release/kt-sync
 
 # Create modules directory with symlinks for app discovery
 
-modules: venv/.afk-installed venv/.window-installed
+kt-server-rust/kt-sync/target/debug/kt-sync:
+	cd kt-server-rust/kt-sync && cargo build
+
+modules: venv/.afk-installed venv/.window-installed kt-server-rust/kt-sync/target/debug/kt-sync
 	mkdir -p modules
-	ln -sf ../venv/bin/kt-watcher-afk modules/kt-watcher-afk
-	ln -sf ../venv/bin/kt-watcher-window modules/kt-watcher-window
+	ln -sf ../venv/bin/aw-watcher-afk modules/kt-watcher-afk
+	ln -sf ../venv/bin/aw-watcher-window modules/kt-watcher-window
+	ln -sf kt-server-rust/kt-sync/target/debug/kt-sync modules/kt-sync
 
 clean-watchers:
 	rm -rf venv modules
