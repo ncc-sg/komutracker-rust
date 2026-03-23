@@ -41,7 +41,7 @@ kt-datastore = { path = "../kt-server-rust/kt-datastore" }
 tauri-plugin-opener = "2"
 glob = "0.3.1"
 [target.'cfg(unix)'.dependencies]
-nix = { version = "0.29.0", features = ["process", "signal"] }
+nix = { version = "0.31.2", features = ["process", "signal"] }
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3.9", features = ["winuser"] }
 
