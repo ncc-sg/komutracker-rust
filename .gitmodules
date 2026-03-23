@@ -1,0 +1,8 @@
+[submodule "aw-watcher-window"]
+	path = aw-watcher-window
+	url = https://github.com/ActivityWatch/aw-watcher-window.git
+	
+[submodule "aw-watcher-afk"]
+	path = aw-watcher-afk
+	url = https://github.com/ActivityWatch/aw-watcher-afk.git
+	
