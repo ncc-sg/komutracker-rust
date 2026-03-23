@@ -25,6 +25,8 @@ dist-ssr
 
 # generated files
 kt-app/icons/*
+!kt-app/icons/dev/
+!kt-app/icons/dev/**
 Cargo.lock
 /target/
 

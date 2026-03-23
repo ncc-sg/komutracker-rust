@@ -25,6 +25,8 @@ use tauri::{
     AppHandle, Manager,
 };
 
+mod mode;
+
 pub struct AppHandleWrapper(Mutex<AppHandle>);
 
 impl Drop for AppHandleWrapper {
@@ -286,6 +288,7 @@ pub struct UserConfig {
 
 impl Default for UserConfig {
     fn default() -> Self {
+        let mode = mode::current();
         let discovery_paths = dirs::get_discovery_paths();
 
         // Build default modules list based on platform and display server
@@ -318,7 +321,10 @@ impl Default for UserConfig {
         });
 
         UserConfig {
-            port: 5600,
+            port: match mode {
+                mode::AppMode::Dev => 5666,
+                mode::AppMode::Release => 5600,
+            },
             discovery_paths,
             autostart: AutostartConfig {
                 enabled: true,
@@ -381,13 +387,13 @@ fn greet(name: &str) -> String {
 fn get_platform() -> String {
     #[cfg(target_os = "macos")]
     return "macos".to_string();
-    
+
     #[cfg(target_os = "windows")]
     return "windows".to_string();
-    
+
     #[cfg(target_os = "linux")]
     return "linux".to_string();
-    
+
     #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
     return "unknown".to_string();
 }
@@ -404,6 +410,8 @@ pub fn run() {
         // Can't use log here since logging isn't initialized yet
         eprintln!("Failed to initialize logging: {}", e);
     }
+
+    let app_mode = mode::current();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -426,7 +434,7 @@ pub fn run() {
                 .expect("Failed to open lock file");
             info!("Another instance is running, quitting!");
         }))
-        .setup(|app| {
+        .setup(move |app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             {
@@ -457,11 +465,15 @@ pub fn run() {
                     }
                 }
 
-                let testing = false;
+                let testing = app_mode.is_dev();
                 let legacy_import = false;
 
                 let mut kt_config = kt_server::config::create_config(testing);
-                kt_config.port = user_config.port;
+                let port = match app_mode {
+                    mode::AppMode::Dev => 5666,
+                    mode::AppMode::Release => user_config.port,
+                };
+                kt_config.port = port;
                 let db_path = kt_server::dirs::db_path(testing)
                     .expect("Failed to get db path")
                     .to_str()
@@ -491,20 +503,19 @@ pub fn run() {
                     asset_resolver: kt_server::endpoints::AssetResolver::new(asset_path_opt),
                     device_id,
                 };
-                if !is_port_available(user_config.port).expect("Failed to check port availability")
-                {
+                if !is_port_available(port).expect("Failed to check port availability") {
                     app.dialog()
-                        .message(format!("Port {} is already in use", user_config.port))
+                        .message(format!("Port {} is already in use", port))
                         .kind(MessageDialogKind::Error)
                         .title("Error")
                         .show(|_| {});
-                    panic!("Port {} is already in use", user_config.port);
+                    panic!("Port {} is already in use", port);
                 }
                 tauri::async_runtime::spawn(build_rocket(server_state, kt_config).launch());
-                let url = format!("http://localhost:{}/", user_config.port)
+                let url = format!("http://localhost:{}/", port)
                     .parse()
                     .expect("Failed to parse localhost url");
-                let mut main_window = app
+                let main_window = app
                     .get_webview_window("main")
                     .expect("Failed to show main window");
 

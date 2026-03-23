@@ -6,10 +6,10 @@ endif
 OS := $(shell uname -s)
 
 build: prebuild
-	npm run tauri build
+	KT_APP_MODE=release TAURI_CONFIG= TAURI_CONFIG_PATH=kt-app/tauri.conf.json npm run tauri build -- --config kt-app/tauri.conf.json
 
 dev: prebuild
-	npm run tauri dev
+	KT_APP_MODE=dev TAURI_CONFIG= TAURI_CONFIG_PATH=kt-app/tauri.dev.conf.json npm run tauri dev -- --config kt-app/tauri.dev.conf.json
 
 %/.git:
 	git submodule update --init --recursive

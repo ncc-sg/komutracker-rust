@@ -12,6 +12,8 @@ use std::sync::Mutex;
 #[cfg(target_os = "android")]
 use lazy_static::lazy_static;
 
+use crate::mode;
+
 #[cfg(target_os = "android")]
 lazy_static! {
     static ref ANDROID_DATA_DIR: Mutex<PathBuf> =
@@ -21,7 +23,10 @@ lazy_static! {
 #[cfg(not(target_os = "android"))]
 pub fn get_config_dir() -> Result<PathBuf, ()> {
     let mut dir = appdirs::user_config_dir(Some("komutracker"), None, false)?;
-    dir.push("kt-app");
+    dir.push(match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    });
     fs::create_dir_all(dir.clone()).expect("Unable to create config dir");
     Ok(dir)
 }
@@ -34,7 +39,10 @@ pub fn get_config_dir() -> Result<PathBuf, ()> {
 #[cfg(not(target_os = "android"))]
 pub fn get_data_dir() -> Result<PathBuf, ()> {
     let mut dir = appdirs::user_data_dir(Some("komutracker"), None, false)?;
-    dir.push("kt-app");
+    dir.push(match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    });
     fs::create_dir_all(dir.clone()).expect("Unable to create data dir");
     Ok(dir)
 }
@@ -51,7 +59,10 @@ pub fn get_data_dir() -> Result<PathBuf, ()> {
 pub fn get_log_dir() -> Result<PathBuf, ()> {
     // Linux uses cache dir for logs
     let mut dir = appdirs::user_cache_dir(Some("komutracker"), None)?;
-    dir.push("kt-app");
+    dir.push(match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    });
     dir.push("log");
     fs::create_dir_all(dir.clone()).expect("Unable to create log dir");
     Ok(dir)
@@ -61,7 +72,10 @@ pub fn get_log_dir() -> Result<PathBuf, ()> {
 pub fn get_log_dir() -> Result<PathBuf, ()> {
     // Windows and macOS use dedicated log directories
     let mut dir = appdirs::user_log_dir(Some("komutracker"), None)?;
-    dir.push("kt-app");
+    dir.push(match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    });
     fs::create_dir_all(dir.clone()).expect("Unable to create log dir");
     Ok(dir)
 }
@@ -89,7 +103,10 @@ pub fn get_runtime_dir() -> PathBuf {
     if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
         let mut dir = PathBuf::from(runtime_dir);
         dir.push("komutracker");
-        dir.push("kt-app");
+        dir.push(match mode::current() {
+            mode::AppMode::Dev => "kt-app-dev",
+            mode::AppMode::Release => "kt-app",
+        });
         if let Ok(_) = fs::create_dir_all(dir.clone()) {
             return dir;
         }
@@ -97,7 +114,10 @@ pub fn get_runtime_dir() -> PathBuf {
     // Fallback to cache dir
     let mut dir = appdirs::user_cache_dir(Some("komutracker"), None)
         .unwrap_or_else(|_| PathBuf::from("/tmp"));
-    dir.push("kt-app");
+    dir.push(match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    });
     let _ = fs::create_dir_all(dir.clone());
     dir
 }
@@ -115,6 +135,11 @@ pub fn get_runtime_dir() -> PathBuf {
 
 pub fn get_discovery_paths() -> Vec<PathBuf> {
     let mut discovery_paths = Vec::new();
+
+    let app_folder = match mode::current() {
+        mode::AppMode::Dev => "kt-app-dev",
+        mode::AppMode::Release => "kt-app",
+    };
 
     #[cfg(target_os = "linux")]
     {
@@ -153,7 +178,12 @@ pub fn get_discovery_paths() -> Vec<PathBuf> {
             let data_dir = std::env::var("XDG_DATA_HOME")
                 .map(PathBuf::from)
                 .unwrap_or_else(|_| home_path.join(".local").join("share"));
-            discovery_paths.push(data_dir.join("komutracker").join("kt-app").join("modules"));
+            discovery_paths.push(
+                data_dir
+                    .join("komutracker")
+                    .join(app_folder)
+                    .join("modules"),
+            );
 
             // Legacy path for backward compatibility
             discovery_paths.push(home_path.join("kt-modules"));
@@ -192,6 +222,10 @@ pub fn get_discovery_paths() -> Vec<PathBuf> {
                 r"C:/Users/{}/AppData/Local/Programs/KomuTracker",
                 username
             )));
+            discovery_paths.push(PathBuf::from(format!(
+                r"C:/Users/{}/AppData/Local/komutracker/{}/modules",
+                username, app_folder
+            )));
         }
     }
 
@@ -222,7 +256,15 @@ pub fn get_discovery_paths() -> Vec<PathBuf> {
         }
 
         if let Ok(home_dir) = std::env::var("HOME") {
-            discovery_paths.push(PathBuf::from(home_dir).join("kt-modules"));
+            discovery_paths.push(PathBuf::from(&home_dir).join("kt-modules"));
+            discovery_paths.push(
+                PathBuf::from(home_dir)
+                    .join("Library")
+                    .join("Application Support")
+                    .join("komutracker")
+                    .join(app_folder)
+                    .join("modules"),
+            );
         }
         discovery_paths.push(PathBuf::from(
             "/Applications/KomuTracker.app/Contents/MacOS",
