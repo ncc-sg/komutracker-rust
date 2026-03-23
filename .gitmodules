@@ -1,6 +1,6 @@
 [submodule "kt-client/aw-watcher-afk"]
 	path = kt-client/aw-watcher-afk
-	url = git@github.com:ncc-sg-komutracker/aw-watcher-afk.git
+	url = git@github.com:ncc-sg/aw-watcher-afk.git
 [submodule "kt-client/aw-watcher-window"]
 	path = kt-client/aw-watcher-window
-	url = git@github.com:ncc-sg-komutracker/aw-watcher-window.git
+	url = git@github.com:ncc-sg/aw-watcher-window.git
