@@ -17,7 +17,7 @@ jobs:
           rustup toolchain install nightly
           rustup component add --toolchain nightly rustfmt
       - name: Check formatting
-        run: cd aw-app; cargo fmt -- --check
+        run: cd kt-app; cargo fmt -- --check
 
   clippy:
     runs-on: ubuntu-latest
@@ -46,9 +46,9 @@ jobs:
       - name: Install node dependencies
         run: npm install
 
-      - name: Build aw-webui and icons
+      - name: Build kt-webui and icons
         run: |
           make prebuild
 
       - name: Run clippy
-        run: cd aw-app; cargo clippy
+        run: cd kt-app; cargo clippy

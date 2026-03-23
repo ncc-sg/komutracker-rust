@@ -14,38 +14,38 @@ dev: prebuild
 %/.git:
 	git submodule update --init --recursive
 
-aw-app/icons/icon.png: aw-webui/.git
-	mkdir -p aw-app/icons
-	npm run tauri icon "./aw-webui/media/logo/logo.png"
+kt-app/icons/icon.png: kt-webui/.git
+	mkdir -p kt-app/icons
+	npm run tauri icon "./kt-webui/media/logo/logo.png"
 
-aw-webui/dist: aw-webui/.git
-	cd aw-webui && make build
+kt-webui/dist: kt-webui/.git
+	cd kt-webui && make build
 
-prebuild: aw-webui/dist node_modules aw-app/icons/icon.png install-watchers modules
+prebuild: kt-webui/dist node_modules kt-app/icons/icon.png install-watchers modules
 
 precommit: format check
 
 format:
-	cd aw-app && cargo fmt
+	cd kt-app && cargo fmt
 
 check:
-	cd aw-app && cargo check && cargo clippy
+	cd kt-app && cargo check && cargo clippy
 
 package:
 ifeq ($(OS),Linux)
-	rm -rf target/package/aw-app
-	mkdir -p target/package/aw-app
-	cp aw-app/target/release/bundle/deb/*.deb target/package/aw-app/aw-app$(ARCH).deb
-	cp aw-app/target/release/bundle/rpm/*.rpm target/package/aw-app/aw-app$(ARCH).rpm
-	cp aw-app/target/release/bundle/appimage/*.AppImage target/package/aw-app/aw-app$(ARCH).AppImage
+	rm -rf target/package/kt-app
+	mkdir -p target/package/kt-app
+	cp kt-app/target/release/bundle/deb/*.deb target/package/kt-app/kt-app$(ARCH).deb
+	cp kt-app/target/release/bundle/rpm/*.rpm target/package/kt-app/kt-app$(ARCH).rpm
+	cp kt-app/target/release/bundle/appimage/*.AppImage target/package/kt-app/kt-app$(ARCH).AppImage
 
-	mkdir -p dist/aw-app
-	rm -rf dist/aw-app/*
-	cp target/package/aw-app/* dist/aw-app/
+	mkdir -p dist/kt-app
+	rm -rf dist/kt-app/*
+	cp target/package/kt-app/* dist/kt-app/
 else
 	rm -rf target/package
 	mkdir -p target/package
-	cp aw-app/target/release/aw-app target/package/aw-app
+	cp kt-app/target/release/kt-app target/package/kt-app
 
 	mkdir -p dist
 	find dist/ -maxdepth 1 -type f -delete 2>/dev/null || true
@@ -61,20 +61,20 @@ venv:
 	./venv/bin/pip install --upgrade pip
 
 venv/.afk-installed: venv
-	cd aw-watcher-afk && ../venv/bin/pip install .
+	cd kt-watcher-afk && ../venv/bin/pip install .
 	touch venv/.afk-installed
 
-venv/.window-installed: venv aw-watcher-window/aw_watcher_window/aw-watcher-window-macos
-	cd aw-watcher-window && ../venv/bin/pip install .
-	cp aw-watcher-window/aw_watcher_window/aw-watcher-window-macos venv/lib/python3.*/site-packages/aw_watcher_window/ 2>/dev/null || true
+venv/.window-installed: venv kt-watcher-window/aw_watcher_window/aw-watcher-window-macos
+	cd kt-watcher-window && ../venv/bin/pip install .
+	cp kt-watcher-window/aw_watcher_window/aw-watcher-window-macos venv/lib/python3.*/site-packages/aw_watcher_window/ 2>/dev/null || true
 	touch venv/.window-installed
 
-aw-watcher-window/aw_watcher_window/aw-watcher-window-macos: aw-watcher-window/aw_watcher_window/macos.swift
+kt-watcher-window/aw_watcher_window/aw-watcher-window-macos: kt-watcher-window/aw_watcher_window/macos.swift
 ifeq ($(OS),Darwin)
-	swiftc aw-watcher-window/aw_watcher_window/macos.swift -o aw-watcher-window/aw_watcher_window/aw-watcher-window-macos
+	swiftc kt-watcher-window/aw_watcher_window/macos.swift -o kt-watcher-window/aw_watcher_window/aw-watcher-window-macos
 else
 	@echo "Skipping Swift build (not on macOS)"
-	@touch aw-watcher-window/aw_watcher_window/aw-watcher-window-macos
+	@touch kt-watcher-window/aw_watcher_window/aw-watcher-window-macos
 endif
 
 install-watcher-afk: venv/.afk-installed
@@ -84,28 +84,29 @@ install-watcher-window: venv/.window-installed
 install-watchers: install-watcher-afk install-watcher-window
 
 run-watcher-afk: venv/.afk-installed
-	./venv/bin/aw-watcher-afk
+	./venv/bin/kt-watcher-afk
 
 run-watcher-window: venv/.window-installed
-	./venv/bin/aw-watcher-window
+	./venv/bin/kt-watcher-window
 
-# aw-sync (Rust binary)
-aw-server-rust/target/release/aw-sync:
-	cd aw-server-rust/aw-sync && cargo build --release
+# kt-sync (Rust binary)
+kt-server-rust/target/release/kt-sync:
+	cd kt-server-rust/kt-sync && cargo build --release
 
-install-sync: aw-server-rust/target/release/aw-sync
-	@echo "aw-sync built successfully"
+install-sync: kt-server-rust/target/release/kt-sync
+	@echo "kt-sync built successfully"
 
-run-sync: aw-server-rust/target/release/aw-sync
-	./aw-server-rust/target/release/aw-sync daemon
+run-sync: kt-server-rust/target/release/kt-sync
+	./kt-server-rust/target/release/kt-sync daemon
 
 # Create modules directory with symlinks for app discovery
+
 modules: venv/.afk-installed venv/.window-installed
 	mkdir -p modules
-	ln -sf ../venv/bin/aw-watcher-afk modules/aw-watcher-afk
-	ln -sf ../venv/bin/aw-watcher-window modules/aw-watcher-window
+	ln -sf ../venv/bin/kt-watcher-afk modules/kt-watcher-afk
+	ln -sf ../venv/bin/kt-watcher-window modules/kt-watcher-window
 
 clean-watchers:
 	rm -rf venv modules
-	rm -f aw-watcher-window/aw_watcher_window/aw-watcher-window-macos
-	cd aw-server-rust && cargo clean
+	rm -f kt-watcher-window/kt_watcher_window/kt-watcher-window-macos
+	cd kt-server-rust && cargo clean

@@ -1,0 +1,25 @@
+##########################
+# kt-server-rust.service #
+##########################
+#
+# 1. Build and package kt-server-rust and kt-webui with "make"
+# 2. Install kt-server-rust with "sudo make install"
+# 3. Run 'systemctl --user daemon-reload' to make systemd load in the new service file
+# 4. Run 'systemctl --user start kt-server-rust.service' to start kt-server-rust
+# 5. (Optional) Run 'systemctl --user enable kt-server-rust.service' to always start kt-server-rust when you log in
+#
+# Now kt-server-rust should be running, you can now start whatever
+# KomuTracker watchers you desire and can find the WebUI at
+# http://localhost:5600
+#
+
+[Service]
+Type=notify
+ExecStart=kt-server
+
+[Unit]
+Description=KomuTracker Server (Rust implementation)
+After=network.target
+
+[Install]
+WantedBy=default.target

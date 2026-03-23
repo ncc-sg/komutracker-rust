@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "kt-client-rust",
+    "kt-datastore",
+    "kt-models",
+    "kt-transform",
+    "kt-server",
+    "kt-sync",
+    "kt-query",
+]
+resolver = "2"

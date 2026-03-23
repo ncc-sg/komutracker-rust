@@ -1,22 +1,22 @@
-activity-watch
-==============
-[![Build](https://github.com/nqdd/activity-watch/actions/workflows/build.yml/badge.svg)](https://github.com/nqdd/activity-watch/actions/workflows/build.yml)
+KomuTracker
+===========
+[![Build](https://github.com/ncc-sg/komutracker-rust/actions/workflows/build.yml/badge.svg)](https://github.com/ncc-sg/komutracker-rust/actions/workflows/build.yml)
 
-A cross-platform ActivityWatch desktop application built with [Tauri 2.x](https://tauri.app/).
+A cross-platform KomuTracker desktop application built with [Tauri 2.x](https://tauri.app/).
 
-This is the modern replacement for aw-qt, providing a streamlined way to run ActivityWatch on all platforms.
+This is the modern replacement for kt-qt, providing a streamlined way to run KomuTracker on all platforms.
 
 ## Features
 
  - **System Tray**: Full-featured tray icon with module management
- - **Module Manager**: Automatic discovery, start/stop, and crash recovery for watchers
- - **Embedded Server**: Runs aw-server-rust as part of the main executable
- - **WebView**: Serves the aw-webui directly within the app
+  - **Module Manager**: Automatic discovery, start/stop, and crash recovery for watchers
+  - **Embedded Server**: Runs kt-server-rust as part of the main executable
+  - **WebView**: Serves the kt-webui directly within the app
  - **Single Instance**: Prevents multiple instances from running
  - **Autostart**: Configurable system autostart with minimized launch option
- - **Notifications**: Native system notifications via aw-notify integration
- - **Sync Support**: Built-in aw-sync daemon support
- - **Linux Wayland**: Auto-detection and aw-awatcher support
+  - **Notifications**: Native system notifications via kt-notify integration
+  - **Sync Support**: Built-in kt-sync daemon support
+  - **Linux Wayland**: Auto-detection and kt-awatcher support
  - **Log Rotation**: Automatic log file rotation (32MB max, 5 rotated files)
  - **TOML Configuration**: User-configurable settings for port, modules, and discovery paths
 
@@ -25,12 +25,12 @@ This is the modern replacement for aw-qt, providing a streamlined way to run Act
  - Builds cross-platform nicely (see [their docs](https://tauri.app/start/prerequisites/))
    - Generates deb and AppImage with a simple `npx tauri build`
    - Uses Gtk on Linux, and [tao](https://github.com/tauri-apps/tao) on Windows and macOS
-   - No more messy PyInstaller for the main entrypoint (aw-qt)
+  - No more messy PyInstaller for the main entrypoint (kt-qt)
    - Good [docs for code-signing](https://tauri.app/distribute/) on all platforms
    - Includes an [updater](https://tauri.app/plugin/updater/) for `MSI`, `.AppImage`, `.app` bundle
  - Contains a webview with an easy interface to Rust code
- - [Tray icon support](https://tauri.app/learn/system-tray/)
- - Mobile support available for iOS and Android
+  - [Tray icon support](https://tauri.app/learn/system-tray/)
+  - Mobile support available for iOS and Android
 
 ## Prerequisites
 
@@ -44,8 +44,8 @@ This is the modern replacement for aw-qt, providing a streamlined way to run Act
 Clone with submodules:
 
 ```sh
-git clone --recursive https://github.com/nqdd/activity-watch.git
-cd activity-watch
+git clone --recursive https://github.com/ncc-sg/komutracker-rust.git
+cd komutracker-rust
 ```
 
 To run in development mode:
@@ -67,9 +67,9 @@ make build
 |---------|-------------|
 | `make build` | Full production build with prebuild step |
 | `make dev` | Development mode with hot reload |
-| `make prebuild` | Build aw-webui, install watchers, setup modules |
+| `make prebuild` | Build kt-webui, install watchers, setup modules |
 | `make install-watchers` | Install both afk and window watchers |
-| `make install-sync` | Build aw-sync |
+| `make install-sync` | Build kt-sync |
 | `make modules` | Create modules directory with symlinks |
 | `make package` | Package built artifacts (platform-specific) |
 | `make format` | Format Rust code |
@@ -78,8 +78,8 @@ make build
 ## Project Structure
 
 ```
-activity-watch/
-├── aw-app/                  # Tauri 2.x application (Rust)
+komutracker-rust/
+├── kt-app/                  # Tauri 2.x application (Rust)
 │   ├── src/
 │   │   ├── main.rs          # Entry point
 │   │   ├── lib.rs           # Core app logic, server, tray
@@ -88,11 +88,11 @@ activity-watch/
 │   │   └── logging.rs       # Log rotation setup
 │   ├── tauri.conf.json      # Tauri configuration
 │   └── capabilities/        # Tauri 2.0 security capabilities
-├── aw-webui/                # Web UI (git submodule, Vue 2.7)
-├── aw-server-rust/          # Server backend (git submodule)
-├── aw-watcher-afk/          # AFK watcher (git submodule, Python)
-├── aw-watcher-window/       # Window watcher (git submodule, Python)
-├── aw-notify/               # Notification binary
+├── kt-webui/                # Web UI (git submodule, Vue 2.7)
+├── kt-server-rust/          # Server backend (git submodule)
+├── kt-watcher-afk/          # AFK watcher (git submodule, Python)
+├── kt-watcher-window/       # Window watcher (git submodule, Python)
+├── kt-notify/               # Notification binary
 ├── modules/                 # Symlinks to built module executables
 ├── venv/                    # Python virtual environment
 └── Makefile                 # Build commands
@@ -101,9 +101,9 @@ activity-watch/
 ## Configuration
 
 Configuration file location (TOML format):
-- **Linux**: `~/.config/activitywatch/aw-app/config.toml`
-- **macOS**: `~/Library/Application Support/activitywatch/aw-app/config.toml`
-- **Windows**: `%APPDATA%\activitywatch\aw-app\config.toml`
+- **Linux**: `~/.config/komutracker/kt-app/config.toml`
+- **macOS**: `~/Library/Application Support/komutracker/kt-app/config.toml`
+- **Windows**: `%APPDATA%\komutracker\kt-app\config.toml`
 
 Example configuration:
 
@@ -113,28 +113,28 @@ port = 5600
 [autostart]
 enabled = true
 minimized = true
-modules = ["aw-watcher-afk", "aw-watcher-window"]
+modules = ["kt-watcher-afk", "kt-watcher-window"]
 
 # Module with custom arguments
-[autostart.modules.aw-sync]
+[autostart.modules.kt-sync]
 args = ["daemon"]
 ```
 
 ## Log Files
 
 Log files with rotation (32MB max, 5 rotated files):
-- **Linux**: `~/.cache/activitywatch/aw-app/log/aw-app.log`
-- **macOS**: `~/Library/Logs/activitywatch/aw-app/aw-app.log`
-- **Windows**: `%LOCALAPPDATA%\activitywatch\aw-app\log\aw-app.log`
+- **Linux**: `~/.cache/komutracker/kt-app/log/kt-app.log`
+- **macOS**: `~/Library/Logs/komutracker/kt-app/kt-app.log`
+- **Windows**: `%LOCALAPPDATA%\komutracker\kt-app\log\kt-app.log`
 
 ## Submodules
 
 | Submodule | Description |
 |-----------|-------------|
-| [aw-webui](https://github.com/ActivityWatch/aw-webui) | Vue 2.7 web interface |
-| [aw-server-rust](https://github.com/ActivityWatch/aw-server-rust) | Rust server backend |
-| [aw-watcher-window](https://github.com/ActivityWatch/aw-watcher-window) | Window activity watcher |
-| [aw-watcher-afk](https://github.com/ActivityWatch/aw-watcher-afk) | AFK detection watcher |
+| [kt-webui](https://github.com/ncc-sg/komutracker-rust/tree/main/kt-webui) | Vue 2.7 web interface |
+| [kt-server-rust](https://github.com/ncc-sg/komutracker-rust/tree/main/kt-server-rust) | Rust server backend |
+| [kt-watcher-window](https://github.com/ncc-sg/komutracker-rust/tree/main/kt-watcher-window) | Window activity watcher |
+| [kt-watcher-afk](https://github.com/ncc-sg/komutracker-rust/tree/main/kt-watcher-afk) | AFK detection watcher |
 
 ## Supported Platforms
 

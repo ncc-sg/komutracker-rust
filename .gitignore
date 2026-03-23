@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 # generated files
-aw-app/icons/*
+kt-app/icons/*
 Cargo.lock
 /target/
 
@@ -32,7 +32,7 @@ Cargo.lock
 venv/
 modules/
 
-# aw-webui build artifacts
-aw-webui/node_modules/
-aw-webui/dist/
-aw-webui/dist-ssr/
+# kt-webui build artifacts
+kt-webui/node_modules/
+kt-webui/dist/
+kt-webui/dist-ssr/

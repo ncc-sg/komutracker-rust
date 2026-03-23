@@ -44,7 +44,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: "./aw-app -> target"
+          workspaces: "./kt-app -> target"
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v6

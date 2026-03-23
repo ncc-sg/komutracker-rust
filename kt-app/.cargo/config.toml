@@ -1,0 +1,2 @@
+[env]
+KT_WEBUI_DIR = { value = "../kt-webui/dist", relative = true }
